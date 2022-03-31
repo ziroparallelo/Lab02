@@ -22,6 +22,8 @@ public class Dizionario {
 		
 		if(dizionario.containsKey(s[0]))
 		{
+			// aggiungo la parola alla lista della chiave
+			
 			for(String ss: dizionario.keySet())
 				if(ss.compareTo(s[0]) == 0)
 					dizionario.get(ss).add(s[1]);
@@ -36,7 +38,7 @@ public class Dizionario {
 	
 	public String cercaParola(String p)
 	{	
-		String s = "**** "+p.toUpperCase()+" ****\n\n\n";
+		String s = "**** "+p+" ****\n\n\n";
 		for(String pp: dizionario.get(p))
 		{
 			s = s+pp+"\n";

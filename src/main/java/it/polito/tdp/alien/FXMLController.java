@@ -1,4 +1,4 @@
-package it.polito.tdp.alien;
+	package it.polito.tdp.alien;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -75,46 +75,75 @@ public class FXMLController {
     		return;
     	}
     	
-    	//solo caratteri richiesti
-    	
-    	int ASCII;
-    	for(String ss: p)
-    	{
-    		ss = ss.toLowerCase();
-    		for(int i = 0; i<ss.length(); i++)
-    		{
-    			ASCII = (int) ss.charAt(i);
-    			if( ASCII < 63 || (ASCII > 63 && ASCII < 97) || ASCII > 127)
-    			{
-    				txtStatus.setText("ERRORE: unici caratteri accettati [a-z,A-Z]");
-    				txtTesto.clear();
-    				return;
-    			}
-    		}
-    	}
-    	
     	//2. Chiedo al modello di fare l'operazione
-    	
-    	
-    	
     	//Ho due operazioni:
     	
-    	//AGGIUNGI TRADUZIONE
+    	// 1. AGGIUNGI TRADUZIONE
+    	// 2. CERCA PAROLA
+    	
+    	
+    	
+    	
+    	// 1. AGGIUNGI TRADUZIONE
+    	
+    	// non devono esserci ? e caratteri speciali
     	
     	if(p.length == 2)
     	{
+        	// Controllo caratteri
+        	
+    		int ASCII;
+        	for(String ss: p)
+        	{
+        		ss = ss.toLowerCase();
+        		for(int i = 0; i<ss.length(); i++)
+        		{
+        			ASCII = (int) ss.charAt(i);
+        			if( ASCII < 97 || ASCII > 127)
+        			{
+        				txtStatus.setText("ERRORE: unici caratteri accettati [a-z,A-Z]");
+        				txtTesto.clear();
+        				return;
+        			}
+        		}
+        	}
+        	
+        	// Operazioni modello
+        	
     		model.aggiungiTraduzione(p);
         	txtVocabolario.setText(model.toString());
         	txtStatus.setText("");
         	txtTesto.clear();
+        	return;
     	}
     	
-    	// CERCA PAROLA
+    	
+    	
+    	
+    	// 2. CERCA PAROLA
+    	
+    	// per cercare una parola ? è consentito invece
+    	
     	if(p.length == 1)
     	{
+    		int ASCII;
+        	for(String ss: p)
+        	{
+        		ss = ss.toLowerCase();
+        		for(int i = 0; i<ss.length(); i++)
+        		{
+        			ASCII = (int) ss.charAt(i);
+        			if( ASCII < 63 || (ASCII > 63 && ASCII < 97) || ASCII > 127)
+        			{
+        				txtStatus.setText("ERRORE: unici caratteri accettati [a-z,A-Z] (un solo ?)");
+        				txtTesto.clear();
+        				return;
+        			}
+        		}
+        	}
     		int cont = 0;
     		
-    		for(int i = 0; i<s.length(); i++)
+    		for(int i = 0; i<p[0].length(); i++)
     		{
     			ASCII = (int) s.charAt(i);
     			if(ASCII == 63)
@@ -127,16 +156,17 @@ public class FXMLController {
     		if(cont == 0)
     		{
     			//PAROLA ESISTE?
-    			boolean ok = model.getDizionario().containsKey(s);
+    			boolean ok = model.getDizionario().containsKey(p[0]);
             	if(ok)
             	{
-            		txtVocabolario.setText(model.cercaParola(s));
+            		txtVocabolario.setText(model.cercaParola(p[0]));
             		txtStatus.setText("");
             		return;
             	}
             	else
             	{
             		txtStatus.setText("ERRORE: Parola non trovata");
+            		txtVocabolario.setText(model.toString());
             		txtTesto.clear();
             		return;
             	}
@@ -148,48 +178,47 @@ public class FXMLController {
     		{
     			String output = "";
     			boolean flag = true;
-				for(int j = 93; j< 127; j++)
+    			for(String ss: model.getDizionario().keySet())
 				{
-					for(String ss: model.getDizionario().keySet())
+    				// carattere minuscolo
+    				
+    				for(int j = 93; j<= 127; j++)
 					{
-						//s parola originale
-						
 						char c = (char) j;
-						s.replace('?', c);
+						String sss = p[0].replace('?', c);
 						
-						if(ss.compareTo(s) == 0)
+						if(ss.compareTo(sss) == 0)
 						{
 							flag = false;
 							output = output + model.cercaParola(ss) +"\n";
 		            		txtStatus.setText("");
 						}
 					}
-				}
-				
-				for(int j = 65; j< 90; j++)
-				{
-					for(String ss: model.getDizionario().keySet())
-					{
-						//s parola originale
-						
+    				// carrattere maiuscolo 
+    				
+    				for(int j = 65; j<= 90; j++)
+    				{
 						char c = (char) j;
-						s.replace('?', c);
-						
-						if(ss.compareTo(s) == 0)
+						String sss = p[0].replace('?', c);
+							
+					    if(ss.compareTo(sss) == 0)
 						{
 							flag = false;
 							output = "\n\n"+output + model.cercaParola(ss) +"\n";
 		            		txtStatus.setText("");
-		            		return;
 						}
-					}
+    				}
 				}
+				
 				if(flag)
 				{
 					txtStatus.setText("ERRORE: Nessuna corrispondenza");
-            		txtTesto.clear();
+					txtVocabolario.setText(model.toString());
             		return;
 				}
+				
+				txtVocabolario.setText(output);
+				return;
     	    }
     		//CASO CON PIU' DI UN ?
     		
